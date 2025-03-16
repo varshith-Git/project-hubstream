@@ -1,27 +1,6 @@
 
 import { toast } from "sonner";
-
-export interface Project {
-  id: string;
-  name: string;
-  createdAt: string;
-  repository?: {
-    url: string;
-    type: 'public' | 'private';
-    structure?: FileNode[];
-  };
-  documentation?: {
-    generated: boolean;
-    content?: string;
-  };
-}
-
-export interface FileNode {
-  name: string;
-  type: 'file' | 'folder';
-  path: string;
-  children?: FileNode[];
-}
+import { Project, Repository, FileNode } from "./projectTypes";
 
 // Mock data - This would be replaced with actual API calls in a real app
 let PROJECTS: Project[] = [
@@ -29,6 +8,7 @@ let PROJECTS: Project[] = [
     id: "1",
     name: "Sample Project",
     createdAt: new Date().toISOString(),
+    repositories: [],
   },
 ];
 
@@ -47,6 +27,7 @@ export const createProject = (name: string): Project => {
     id: Date.now().toString(),
     name: name.trim(),
     createdAt: new Date().toISOString(),
+    repositories: [],
   };
   
   PROJECTS = [...PROJECTS, newProject];
@@ -55,14 +36,24 @@ export const createProject = (name: string): Project => {
 };
 
 // Import repository to project
-export const importRepository = (projectId: string, repoUrl: string, repoType: 'public' | 'private'): Project => {
+export const importRepository = (
+  projectId: string, 
+  repoUrl: string, 
+  repoType: 'public' | 'private' | 'local',
+  source: 'github' | 'bitbucket' | 'local'
+): Project => {
   const project = PROJECTS.find(p => p.id === projectId);
   
   if (!project) {
     throw new Error("Project not found");
   }
+
+  // Get repository name from URL or use a placeholder for local
+  const repoName = source === 'local' 
+    ? 'Local Repository' 
+    : repoUrl.split('/').pop() || 'Repository';
   
-  // Mock folder structure - In reality, this would come from a GitHub API call
+  // Mock folder structure - In reality, this would come from an API call
   const mockStructure: FileNode[] = [
     {
       name: 'src',
@@ -104,14 +95,20 @@ export const importRepository = (projectId: string, repoUrl: string, repoType: '
     { name: 'README.md', type: 'file', path: 'README.md' },
   ];
   
-  // Update the project with repository info
+  // Create a new repository object
+  const newRepository: Repository = {
+    id: Date.now().toString(),
+    url: repoUrl,
+    type: repoType,
+    source: source,
+    name: repoName,
+    structure: mockStructure,
+  };
+  
+  // Update the project with new repository
   const updatedProject = {
     ...project,
-    repository: {
-      url: repoUrl,
-      type: repoType,
-      structure: mockStructure,
-    }
+    repositories: [...project.repositories, newRepository],
   };
   
   // Update projects array
@@ -122,18 +119,22 @@ export const importRepository = (projectId: string, repoUrl: string, repoType: '
 };
 
 // Generate documentation for a project
-export const generateDocumentation = async (projectId: string, filePath: string): Promise<Project> => {
+export const generateDocumentation = async (
+  projectId: string, 
+  repoId: string,
+  filePath: string
+): Promise<Project> => {
   const project = PROJECTS.find(p => p.id === projectId);
   
   if (!project) {
     throw new Error("Project not found");
   }
   
-  // Mock file content - would actually be fetched from GitHub
-  const mockFileContent = `# Sample Project
+  // Mock file content - would actually be fetched from the repository
+  const mockFileContent = `# ${project.name} Documentation
 
 This is a mock file content. In a real app, this would be the actual content of the file
-from the GitHub repository.
+from the repository.
 
 ## Getting Started
 
@@ -168,7 +169,7 @@ const App = () => {
 | /api/projects | POST | Create a new project |`;
 
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 1500));
   
   // Update the project with documentation
   const updatedProject = {
@@ -176,6 +177,7 @@ const App = () => {
     documentation: {
       generated: true,
       content: mockFileContent,
+      sourceRepo: repoId
     }
   };
   
@@ -213,4 +215,20 @@ export const downloadDocumentation = (projectId: string): void => {
   }, 0);
   
   toast.success("Documentation downloaded");
+};
+
+// Get project by id
+export const getProjectById = (projectId: string): Project | undefined => {
+  return PROJECTS.find(p => p.id === projectId);
+};
+
+// Get repository by id
+export const getRepositoryById = (
+  projectId: string, 
+  repoId: string
+): Repository | undefined => {
+  const project = PROJECTS.find(p => p.id === projectId);
+  if (!project) return undefined;
+  
+  return project.repositories.find(r => r.id === repoId);
 };
