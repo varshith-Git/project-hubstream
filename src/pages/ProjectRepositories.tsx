@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,9 @@ import {
   ChevronLeft, 
   PlusCircle, 
   FileText,
-  Download
+  Download,
+  Github,
+  Briefcase
 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import ImportRepoModal from '@/components/ImportRepoModal';
@@ -355,7 +356,3 @@ const ProjectRepositories: React.FC = () => {
 };
 
 export default ProjectRepositories;
-
-// Import missing components
-import { Github, Briefcase } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
