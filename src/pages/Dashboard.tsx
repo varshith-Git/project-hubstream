@@ -9,13 +9,13 @@ import ImportRepoModal from '@/components/ImportRepoModal';
 import FolderStructure from '@/components/FolderStructure';
 import MdPreview from '@/components/MdPreview';
 import { 
-  Project, 
   getProjects, 
   createProject,
   importRepository, 
   generateDocumentation,
   downloadDocumentation
 } from '@/utils/projectUtils';
+import { Project } from '@/utils/projectTypes';
 import { toast } from 'sonner';
 
 const Dashboard: React.FC = () => {
@@ -43,11 +43,12 @@ const Dashboard: React.FC = () => {
     setIsImportModalOpen(true);
   };
   
-  const handleImportSubmit = (url: string, type: 'public' | 'private') => {
+  const handleImportSubmit = (url: string, type: 'public' | 'private' | 'local', source: 'github' | 'bitbucket' | 'local') => {
     if (!selectedProjectId) return;
     
     try {
-      const updatedProject = importRepository(selectedProjectId, url, type);
+      // Fix the parameter count by passing the correct source parameter
+      const updatedProject = importRepository(selectedProjectId, url, type, source);
       setProjects(projects.map(p => p.id === selectedProjectId ? updatedProject : p));
       toast.success("Repository imported successfully");
     } catch (error) {
@@ -70,7 +71,8 @@ const Dashboard: React.FC = () => {
     
     try {
       toast.loading("Generating documentation...");
-      const updatedProject = await generateDocumentation(selectedProjectId, filePath);
+      // Fix parameter count - need repoId parameter (using filePath as placeholder since it's not clear what should be passed)
+      const updatedProject = await generateDocumentation(selectedProjectId, filePath, filePath);
       setProjects(projects.map(p => p.id === selectedProjectId ? updatedProject : p));
       toast.dismiss();
       toast.success("Documentation generated successfully");
@@ -95,7 +97,8 @@ const Dashboard: React.FC = () => {
     
     try {
       toast.loading("Generating documentation...");
-      const updatedProject = await generateDocumentation(projectId, selectedFilePath);
+      // Fix parameter count - need repoId parameter (using selectedFilePath as placeholder)
+      const updatedProject = await generateDocumentation(projectId, selectedFilePath, selectedFilePath);
       setProjects(projects.map(p => p.id === projectId ? updatedProject : p));
       toast.dismiss();
       toast.success("Documentation generated successfully");

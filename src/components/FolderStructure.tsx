@@ -19,7 +19,7 @@ import {
   FileCode
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FileNode } from '@/utils/projectUtils';
+import { FileNode } from '@/utils/projectTypes';
 
 interface FolderStructureProps {
   isOpen: boolean;

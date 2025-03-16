@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Github, FileUp, Briefcase } from 'lucide-react';
+import { Github, FileUp, Briefcase, FolderGit2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ImportRepoModalProps {
@@ -21,6 +21,15 @@ interface ImportRepoModalProps {
   onClose: () => void;
   onImport: (url: string, type: 'public' | 'private' | 'local', source: 'github' | 'bitbucket' | 'local') => void;
   projectId: string;
+}
+
+// Add this declaration to fix the webkitdirectory TypeScript error
+declare module 'react' {
+  interface HTMLAttributes<T> {
+    // Add missing attributes that aren't in the TypeScript definitions
+    webkitdirectory?: string;
+    directory?: string;
+  }
 }
 
 const ImportRepoModal: React.FC<ImportRepoModalProps> = ({

@@ -14,9 +14,19 @@ import { Project } from '@/utils/projectTypes';
 
 interface ProjectTileProps {
   project: Project;
+  onImportRepo: (projectId: string) => void;
+  onGenerateDoc: (projectId: string) => void | Promise<void>;
+  onDownloadDoc: (projectId: string) => void;
+  onViewStructure: (projectId: string) => void;
 }
 
-const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
+const ProjectTile: React.FC<ProjectTileProps> = ({ 
+  project, 
+  onImportRepo, 
+  onGenerateDoc, 
+  onDownloadDoc, 
+  onViewStructure 
+}) => {
   const navigate = useNavigate();
   
   // Format date to be more readable
